@@ -1,0 +1,10 @@
+type ls to check where you are
+
+if you see requirements.txt within files 
+type:
+pip install -r requirements.txt
+
+* wait untill all packages are downloaded 
+
+type:
+python manage.py runserver

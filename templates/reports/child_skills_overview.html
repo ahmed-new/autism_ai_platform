@@ -1,0 +1,164 @@
+<!-- child_skills_overview.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}نظرة عامة لمهارات {{ child.username }}{% endblock %}
+
+{% block extra_head %}
+<style>
+  body{font-family:Tahoma,Arial;background:#f7f9fc}
+  .page-wrap{padding:24px}
+  h2{margin:0 0 6px}
+  .sub{color:#667085;margin:0 0 16px}
+  table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  th,td{padding:10px;border-bottom:1px solid #eee;text-align:center}
+  th{background:#f1f3f8}
+  .tag{padding:4px 8px;border-radius:999px;font-size:12px;color:#fff;display:inline-block}
+  .w{background:#e74a3b}            /* تحتاج تحسين */
+  .g{background:#f1c40f;color:#222}  /* جيدة */
+  .s{background:#2ecc71}            /* قوية */
+  a.btn{background:#4e73df;color:#fff;padding:6px 10px;border-radius:8px;text-decoration:none}
+
+  /* ===== ضبط المخطط بدون كسر التنسيق ===== */
+  .chart-wrap{
+    position:relative;
+    width:100%;
+    height:320px;      /* ارتفاع منطقي للمخطط */
+    min-height:220px;
+    max-height:50vh;   /* لا يزيد عن نصف الشاشة */
+  }
+  #sessionsTrend{
+    display:block;
+    width:100% !important;
+    height:100% !important;  /* اجعل الكانفس يملأ الحاوية */
+  }
+  @media (max-width:768px){
+    .chart-wrap{height:260px}
+  }
+</style>
+<!-- مكتبة Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+
+  <h2>نظرة عامة — {{ child.username }}</h2>
+
+  {% if session %}
+    <p class="sub">
+      جلسة #{{ session.id }} —
+      من {{ session.started_at|date:"Y-m-d H:i" }}
+      إلى {{ session.ended_at|date:"Y-m-d H:i" }}
+      — <strong>المدة: {{ session.duration_human }}</strong>
+      — الحالة: {{ session.get_status_display }}
+    </p>
+  {% else %}
+    <p class="sub">بدون تحديد جلسة (إجمالي جميع الجلسات)</p>
+  {% endif %}
+
+  {% if session_trend and session_trend|length %}
+  <!-- ===== ترند الجلسات: الدقة والانتباه ===== -->
+  <div class="card" style="background:#fff;border-radius:12px;padding:16px;margin:14px 0;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+    <h3 style="margin:0 0 10px">تطور الجلسات (الدقة • الانتباه)</h3>
+    <div class="chart-wrap">
+      <canvas id="sessionsTrend" aria-label="مخطط تطور الجلسات"></canvas>
+    </div>
+    <div class="sub" style="margin-top:8px">
+      يظهر تطور الأداء عبر الجلسات المكتملة. المحور الرأسي بالنسب % والمحور الأفقي بالتاريخ.
+    </div>
+  </div>
+  {% endif %}
+
+  <table>
+    <thead>
+      <tr>
+        <th>المجموعة</th>
+        <th>الدقة</th>
+        <th>الانتباه</th>
+        <th>ص/غ</th>
+        <th>الحالة</th>
+        <th>تفاصيل</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in skills %}
+        <tr>
+          <td>{{ s.group_name }}</td>
+          <td>{{ s.accuracy_pct }}%</td>
+          <td>{{ s.attention_pct }}%</td>
+          <td>{{ s.counts.correct }}/{{ s.counts.total }}</td>
+          <td>
+            {% if s.level == 'needs_improvement' %}
+              <span class="tag w">تحتاج تحسين</span>
+            {% elif s.level == 'strong' %}
+              <span class="tag s">قوية</span>
+            {% else %}
+              <span class="tag g">جيدة</span>
+            {% endif %}
+          </td>
+          <td>
+            <a class="btn"
+               href="{% url 'group_skills' child.id s.group_id %}{% if session %}?session_id={{ session.id }}{% endif %}">
+              فتح
+            </a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6">لا توجد بيانات بعد.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+
+{% if session_trend and session_trend|length %}
+<script>
+  (function(){
+    const labels = [
+      {% for p in session_trend %}'{{ p.label }}'{% if not forloop.last %}, {% endif %}{% endfor %}
+    ];
+    const accData = [
+      {% for p in session_trend %}{{ p.accuracy_pct|default:"0" }}{% if not forloop.last %}, {% endif %}{% endfor %}
+    ];
+    const attData = [
+      {% for p in session_trend %}{{ p.attention_pct|default:"0" }}{% if not forloop.last %}, {% endif %}{% endfor %}
+    ];
+
+    const el = document.getElementById('sessionsTrend');
+    if (!el) return;
+
+    const chart = new Chart(el, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label:'الدقة %',    data: accData, borderWidth:3, pointRadius:3, tension:0.35, fill:false },
+          { label:'الانتباه %', data: attData, borderWidth:3, pointRadius:3, tension:0.35, fill:false }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,   // نعتمد على ارتفاع .chart-wrap
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 10, usePointStyle: true } },
+          tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y}%` } }
+        },
+        scales: {
+          y: { min:0, max:100, ticks:{ callback:(v)=> v + '%' }, grid:{ color:'rgba(0,0,0,0.06)' } },
+          x: { grid:{ display:false }, ticks:{ maxRotation:0, autoSkip:true, maxTicksLimit:8 } }
+        }
+      }
+    });
+
+    // أعِد القياس عند تغيّر حجم الحاوية
+    if ('ResizeObserver' in window){
+      const ro = new ResizeObserver(() => chart.resize());
+      ro.observe(el.parentElement);
+    }
+  })();
+</script>
+{% endif %}
+
+{% endblock %}

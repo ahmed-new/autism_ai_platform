@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}غير مصرح{% endblock %}
+
+{% block extra_head %}
+<style>
+  .alert{
+    background:#fff3f3;
+    border:1px solid #f5cccc;
+    color:#a1231e;
+    border-radius:12px;
+    padding:16px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+  <div class="alert">
+    <h3 style="margin-top:0">غير مصرح لك بزيارة هذه الصفحة.</h3>
+    <p>تأكد من نوع حسابك أو سجّل الدخول بالحساب الصحيح.</p>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+      <a class="btn btn--ghost" href="/">العودة للصفحة الرئيسية</a>
+    </div>
+  </div>
+{% endblock %}

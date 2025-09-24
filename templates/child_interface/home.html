@@ -1,0 +1,469 @@
+{% extends "base.html" %}
+
+{% block title %}مرحبًا يا {{ child.username }}{% endblock %}
+
+{% block extra_head %}
+<style>
+  :root{
+    --bg:#f6f8fb; --card:#fff; --ring:#e5e7eb; --muted:#667085;
+    --primary:#4e73df; --primary-600:#2e59d9; --shadow:0 4px 14px rgba(0,0,0,.08);
+    --green:#10b981; --orange:#f59e0b; --purple:#8b5cf6; --pink:#ec4899;
+    --yellow:#fbbf24; --blue:#3b82f6;
+  }
+  
+  /* Animation keyframes */
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  
+  @keyframes wiggle {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(3deg); }
+    75% { transform: rotate(-3deg); }
+    100% { transform: rotate(0deg); }
+  }
+  
+  .kid-dashboard {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  
+  .kid-hero{
+    display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+    background:linear-gradient(135deg,#eef2ff,#fdf2f8);
+    border:2px solid var(--ring); border-radius:24px; padding:24px 28px; 
+    box-shadow:var(--shadow);
+    margin-bottom:24px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .kid-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(255,255,255,0.8) 10%, transparent 70%);
+    opacity: 0.6;
+    border-radius: 50%;
+    transform: translate(30%, -30%);
+  }
+  
+  .kid-hero .avatar{
+    width:80px; height:80px; border-radius:50%; 
+    background:linear-gradient(135deg, #fff, #f0f4ff); 
+    border:3px solid #dbe1ff;
+    display:grid; place-items:center; font-weight:800; 
+    color:#1e2a78; font-size:28px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    animation: pulse 3s infinite ease-in-out;
+  }
+  
+  .kid-hero h1{ 
+    margin:0; 
+    font-size:28px;
+    background: linear-gradient(90deg, #1e2a78, #4e73df);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 1px 1px rgba(255,255,255,0.7);
+  }
+  
+  .kid-hero .sub{ 
+    color:var(--muted); 
+    margin:8px 0 0;
+    font-size: 16px;
+  }
+  
+  .kid-hero .emoji {
+    font-size: 32px;
+    margin-right: 5px;
+    animation: wiggle 3s infinite ease-in-out;
+    display: inline-block;
+  }
+
+  .welcome-message {
+    margin-top: 10px;
+    font-size: 18px;
+    color: #4b5563;
+    font-weight: 500;
+  }
+
+  .tip{
+    background:#fff; 
+    border:2px dashed #cfd7ff; 
+    border-radius:18px; 
+    padding:16px 20px; 
+    color:#394053;
+    margin-bottom:24px; 
+    display:flex; 
+    align-items:flex-start; 
+    gap:15px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+  }
+  
+  .tip:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0,0,0,0.08);
+  }
+  
+  .tip .icon{ 
+    font-size:32px;
+    animation: float 3s infinite ease-in-out;
+  }
+
+  .cats{
+    display:grid; 
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); 
+    gap:20px;
+  }
+  
+  .cat-card{
+    background:var(--card); 
+    border:2px solid var(--ring); 
+    border-radius:24px; 
+    box-shadow:var(--shadow);
+    padding:20px; 
+    text-align:center; 
+    position:relative; 
+    overflow:hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .cat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 20px rgba(0,0,0,0.12);
+    border-color: #cfd7ff;
+  }
+  
+  .cat-card::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, var(--green), var(--blue));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .cat-card:hover::after {
+    opacity: 1;
+  }
+  
+  .cat-badge{
+    width:80px; 
+    height:80px; 
+    border-radius:50%; 
+    display:grid; 
+    place-items:center;
+    margin:10px auto 16px; 
+    font-size:32px; 
+    font-weight:700; 
+    color:#fff;
+    background:linear-gradient(135deg,var(--primary),var(--primary-600));
+    box-shadow: 0 8px 16px rgba(78, 115, 223, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .cat-card:hover .cat-badge {
+    transform: scale(1.1) rotate(5deg);
+  }
+  
+  /* تنويعات ألوان مرحة حسب ترتيب العناصر */
+  .cat-card:nth-child(5n+1) .cat-badge{ 
+    background:linear-gradient(135deg,var(--green),#34d399);
+    box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+  }
+  .cat-card:nth-child(5n+2) .cat-badge{ 
+    background:linear-gradient(135deg,var(--orange),#fb923c);
+    box-shadow: 0 8px 16px rgba(245, 158, 11, 0.3);
+  }
+  .cat-card:nth-child(5n+3) .cat-badge{ 
+    background:linear-gradient(135deg,var(--purple),#a78bfa);
+    box-shadow: 0 8px 16px rgba(139, 92, 246, 0.3);
+  }
+  .cat-card:nth-child(5n+4) .cat-badge{ 
+    background:linear-gradient(135deg,var(--pink),#f472b6);
+    box-shadow: 0 8px 16px rgba(236, 72, 153, 0.3);
+  }
+  .cat-card:nth-child(5n+5) .cat-badge{ 
+    background:linear-gradient(135deg,var(--yellow),#fcd34d);
+    box-shadow: 0 8px 16px rgba(251, 191, 36, 0.3);
+  }
+
+  .cat-name{ 
+    font-size:22px; 
+    margin:0 0 16px; 
+    color:#1f2937; 
+    font-weight:700;
+    transition: all 0.3s ease;
+  }
+  
+  .cat-card:hover .cat-name {
+    color: var(--primary);
+  }
+  
+  .cat-description {
+    color: var(--muted);
+    font-size: 15px;
+    margin-bottom: 16px;
+    min-height: 40px;
+  }
+  
+  .cat-btn{
+    background:var(--primary); 
+    color:#fff; 
+    border:none; 
+    border-radius:16px;
+    padding:14px 20px; 
+    cursor:pointer; 
+    width:100%; 
+    font-size:18px; 
+    font-weight: 600;
+    transition:.3s;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+  
+  .cat-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: all 0.6s ease;
+    z-index: -1;
+  }
+  
+  .cat-btn:hover{ 
+    background:var(--primary-600);
+    transform: scale(1.03);
+    box-shadow: 0 5px 15px rgba(46, 89, 217, 0.4);
+  }
+  
+  .cat-btn:hover::before {
+    left: 100%;
+  }
+
+  .cat-btn:active {
+    transform: scale(0.98);
+  }
+
+  .soft{ 
+    color:#374151; 
+    font-size:16px; 
+    margin:0 0 5px;
+    font-weight: 500;
+  }
+  
+  .meta-line{ 
+    color:var(--muted); 
+    font-size:14px; 
+    margin:0;
+    line-height: 1.5;
+  }
+  
+  .progress-section {
+    margin-bottom: 24px;
+    background: #fff;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--ring);
+  }
+  
+  .progress-title {
+    font-size: 20px;
+    color: #1f2937;
+    margin: 0 0 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .progress-title .icon {
+    font-size: 24px;
+  }
+  
+  .progress-bar {
+    height: 12px;
+    background: #e5e7eb;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--primary-600));
+    border-radius: 6px;
+    width: 65%;
+    transition: width 1s ease;
+  }
+  
+  .achievements {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+  }
+  
+  .achievement {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .achievement .icon {
+    font-size: 20px;
+  }
+  
+  .achievement-text {
+    font-size: 14px;
+    color: #4b5563;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+  }
+  
+  .empty-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+    color: #d1d5db;
+  }
+  
+  .empty-title {
+    font-size: 20px;
+    color: #4b5563;
+    margin-bottom: 10px;
+  }
+  
+  .empty-message {
+    color: var(--muted);
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .kid-hero {
+      padding: 20px;
+    }
+    
+    .kid-hero .avatar {
+      width: 70px;
+      height: 70px;
+      font-size: 24px;
+    }
+    
+    .kid-hero h1 {
+      font-size: 24px;
+    }
+    
+    .cats {
+      grid-template-columns: 1fr;
+    }
+    
+    .cat-badge {
+      width: 70px;
+      height: 70px;
+      font-size: 28px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="kid-dashboard">
+  <!-- ترويسة مرِحة للطفل -->
+  <div class="kid-hero">
+    <div class="avatar">{{ child.username|slice:":1" }}</div>
+    <div>
+      <h1>مرحبًا يا {{ child.username }} <span class="emoji">👋</span></h1>
+      <p class="sub">
+        جاهزين نلعب ونتعلم شوية مهارات ممتعة!
+        {% if child.age_years %} — <strong>العمر:</strong> {{ child.age_years }} سنة{% endif %}
+      </p>
+      <p class="welcome-message">أهلاً بك في عالم المرح والتعلم! يوم جديد مليء بالمغامرات ينتظرك 🌟</p>
+    </div>
+  </div>
+
+  <!-- قسم التقدم -->
+  <div class="progress-section">
+    <h2 class="progress-title"><span class="icon">🏆</span> تقدمك اليوم</h2>
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+    <p class="meta-line">أحسنت! استمر في التعلم واللعب لتكمل تقدمك اليومي</p>
+    
+    <div class="achievements">
+      <div class="achievement">
+        <span class="icon">⭐</span>
+        <span class="achievement-text">أكملت 3 تحديات</span>
+      </div>
+      <div class="achievement">
+        <span class="icon">🎯</span>
+        <span class="achievement-text">تعلمت مهارة جديدة</span>
+      </div>
+      <div class="achievement">
+        <span class="icon">🔥</span>
+        <span class="achievement-text">يومك الثالث على التوالي!</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- تلميح بسيط -->
+  <div class="tip">
+    <div class="icon">🎯</div>
+    <div>
+      <div class="soft">اختر المجال اللي عايز تبدأ به النهارده 👇</div>
+      <p class="meta-line">نقدر نغيّر المجال في أي وقت، وخطوتنا الجاية سؤال بسيط وسريع 😄</p>
+    </div>
+  </div>
+
+  <!-- شبكة التصنيفات -->
+  <div class="cats">
+    {% for category in categories %}
+      <div class="cat-card">
+        <div class="cat-badge">★</div>
+        <div class="cat-name">{{ category.name }}</div>
+        <div class="cat-description">
+          استكشف مهارات جديدة ومثيرة في هذا المجال الممتع
+        </div>
+        <form method="post" action="{% url 'start_ai_session' %}">
+          {% csrf_token %}
+          <input type="hidden" name="category_id" value="{{ category.id }}">
+          <button class="cat-btn" type="submit">ابدأ هذه الجلسة</button>
+        </form>
+      </div>
+    {% empty %}
+      <div class="empty-state">
+        <div class="empty-icon">🙈</div>
+        <h3 class="empty-title">لا توجد تصنيفات متاحة</h3>
+        <p class="empty-message">تواصل مع الأخصائي لإضافة مجالات مناسبة لعمر {{ child.username }}.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

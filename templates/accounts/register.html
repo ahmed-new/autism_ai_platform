@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>تسجيل حساب | {{ SITE_NAME|default:"تمكين" }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --bg: #f8fafd;
+      --card: #fff;
+      --bd: #e5e7eb;
+      --txt: #1f2937;
+      --muted: #667085;
+      --primary: #4e73df;
+      --primary-600: #2e59d9;
+      --danger: #e74a3b;
+      --success: #16a34a;
+      --radius: 14px;
+      --radius-sm: 10px;
+      --shadow: 0 4px 16px rgba(0,0,0,.08);
+      --transition: all 0.2s ease-in-out;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: Tahoma, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--txt);
+      margin: 0;
+      line-height: 1.7;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 0;
+      background-image: radial-gradient(circle at 10% 20%, rgba(78,115,223,0.05) 0%, rgba(255,255,255,0) 80%),
+                        radial-gradient(circle at 90% 80%, rgba(78,115,223,0.05) 0%, rgba(255,255,255,0) 80%);
+    }
+    
+    .wrap {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, rgba(78,115,223,0.08) 0%, rgba(255,255,255,0) 70%);
+      border-radius: 0 0 0 100%;
+      z-index: 0;
+    }
+    
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+      position: relative;
+    }
+    
+    .logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #eef2ff 0%, #f5f7ff 100%);
+      border: 2px solid #d7ddff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: var(--primary);
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(78,115,223,0.15);
+    }
+    
+    h1 {
+      font-size: 1.8rem;
+      margin: 0 0 8px;
+      color: var(--txt);
+    }
+    
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+    }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    
+    .row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    
+    @media (max-width: 640px) {
+      .row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      
+      .card {
+        padding: 24px;
+      }
+    }
+    
+    .row label {
+      color: var(--txt);
+      font-weight: 600;
+      padding-top: 12px;
+    }
+    
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: 100%;
+    }
+    
+    .row input,
+    .row select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--bd);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+    
+    .row input:focus,
+    .row select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(78,115,223,0.15);
+    }
+    
+    .row.has-error input,
+    .row.has-error select {
+      border-color: var(--danger);
+      background-color: rgba(231, 74, 59, 0.03);
+    }
+    
+    .row.has-error input:focus,
+    .row.has-error select:focus {
+      box-shadow: 0 0 0 3px rgba(231, 74, 59, 0.15);
+    }
+    
+    .err {
+      color: var(--danger);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .err::before {
+      content: "!";
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      background: var(--danger);
+      color: white;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .errors {
+      background: #fdeaea;
+      color: #a1231e;
+      border: 1px solid #f5cccc;
+      padding: 16px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 24px;
+      position: relative;
+      padding-right: 40px;
+    }
+    
+    .errors::before {
+      content: "!";
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      background: #a1231e;
+      color: white;
+      border-radius: 50%;
+      font-weight: bold;
+    }
+    
+    .help {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 16px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+    
+    button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 14px 24px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: var(--transition);
+      min-width: 140px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(78,115,223,0.2);
+    }
+    
+    button:hover {
+      background: var(--primary-600);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(78,115,223,0.3);
+    }
+    
+    button:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(78,115,223,0.3);
+    }
+    
+    .login-link {
+      margin-top: 24px;
+      text-align: center;
+      color: var(--muted);
+    }
+    
+    .login-link a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+    
+    .form-section {
+      border-top: 1px solid var(--bd);
+      padding-top: 20px;
+      margin-top: 20px;
+    }
+    
+    .form-section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--primary);
+    }
+    
+    .user-type-selector {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    
+    .user-type-option {
+      flex: 1;
+      min-width: 120px;
+    }
+    
+    .user-type-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .user-type-option label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 16px;
+      background: #fff;
+      border: 1px solid var(--bd);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+    }
+    
+    .user-type-option input[type="radio"]:checked + label {
+      background: #eef2ff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(78,115,223,0.15);
+    }
+    
+    .user-type-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    
+    .user-type-name {
+      font-weight: 600;
+    }
+    
+    .user-type-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="header">
+        <div class="logo">ت</div>
+        <div>
+          <h1>إنشاء حساب جديد</h1>
+          <p class="subtitle">انضم إلى منصة تمكين لدعم الأطفال ذوي التوحد وتنمية مهاراتهم</p>
+        </div>
+      </div>
+
+      {# أخطاء غير مرتبطة بحقول معينة #}
+      {% if form.non_field_errors %}
+        <div class="errors">
+          {% for e in form.non_field_errors %}{{ e }}<br>{% endfor %}
+        </div>
+      {% endif %}
+
+      {# رسالة عامة في حال وجود أي أخطاء #}
+      {% if form.errors and not form.non_field_errors %}
+        <div class="errors">يرجى تصحيح الأخطاء أدناه.</div>
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        
+        <div class="form-grid">
+          <div class="row {% if form.username.errors %}has-error{% endif %}">
+            <label for="{{ form.username.id_for_label }}">اسم المستخدم</label>
+            <div class="field">
+              {{ form.username }}
+              {% for e in form.username.errors %}<div class="err">{{ e }}</div>{% endfor %}
+            </div>
+          </div>
+
+          <div class="row {% if form.email.errors %}has-error{% endif %}">
+            <label for="{{ form.email.id_for_label }}">البريد الإلكتروني</label>
+            <div class="field">
+              {{ form.email }}
+              {% for e in form.email.errors %}<div class="err">{{ e }}</div>{% endfor %}
+            </div>
+          </div>
+          
+          <div class="form-section">
+            <div class="form-section-title">نوع الحساب</div>
+            <div class="user-type-selector">
+              <div class="user-type-option">
+                <input type="radio" name="user_type" id="user_type_parent" value="parent" {% if form.user_type.value == 'parent' %}checked{% endif %}>
+                <label for="user_type_parent">
+                  <span class="user-type-icon">👪</span>
+                  <span class="user-type-name">ولي أمر</span>
+                  <span class="user-type-desc">متابعة تقدم الطفل والحصول على توصيات</span>
+                </label>
+              </div>
+              
+              <div class="user-type-option">
+                <input type="radio" name="user_type" id="user_type_specialist" value="specialist" {% if form.user_type.value == 'specialist' %}checked{% endif %}>
+                <label for="user_type_specialist">
+                  <span class="user-type-icon">👩‍⚕️</span>
+                  <span class="user-type-name">أخصائي</span>
+                  <span class="user-type-desc">متابعة الحالات وتقديم الدعم المتخصص</span>
+                </label>
+              </div>
+              
+              <div class="user-type-option">
+                <input type="radio" name="user_type" id="user_type_child" value="child" {% if form.user_type.value == 'child' %}checked{% endif %}>
+                <label for="user_type_child">
+                  <span class="user-type-icon">👶</span>
+                  <span class="user-type-name">طفل</span>
+                  <span class="user-type-desc">الوصول إلى الأنشطة والجلسات التفاعلية</span>
+                </label>
+              </div>
+            </div>
+            {% for e in form.user_type.errors %}<div class="err">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div id="child-fields" class="form-section {% if not form.show_child_fields and not form.age_years.errors and not form.parent.errors and not form.specialist.errors %}hidden{% endif %}">
+            <div class="form-section-title">معلومات الطفل</div>
+            
+            <div id="row-age" class="row {% if form.age_years.errors %}has-error{% endif %}">
+              <label for="{{ form.age_years.id_for_label }}">العمر (بالسنوات)</label>
+              <div class="field">
+                {{ form.age_years }}
+                {% if form.age_years.help_text %}<div class="help">{{ form.age_years.help_text }}</div>{% endif %}
+                {% for e in form.age_years.errors %}<div class="err">{{ e }}</div>{% endfor %}
+              </div>
+            </div>
+
+            <div id="row-parent" class="row {% if form.parent.errors %}has-error{% endif %}">
+              <label for="{{ form.parent.id_for_label }}">وليّ الأمر</label>
+              <div class="field">
+                {{ form.parent }}
+                {% for e in form.parent.errors %}<div class="err">{{ e }}</div>{% endfor %}
+              </div>
+            </div>
+
+            <div id="row-specialist" class="row {% if form.specialist.errors %}has-error{% endif %}">
+              <label for="{{ form.specialist.id_for_label }}">الأخصائي</label>
+              <div class="field">
+                {{ form.specialist }}
+                {% for e in form.specialist.errors %}<div class="err">{{ e }}</div>{% endfor %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-section">
+            <div class="form-section-title">كلمة المرور</div>
+            
+            <div class="row {% if form.password1.errors %}has-error{% endif %}">
+              <label for="{{ form.password1.id_for_label }}">كلمة المرور</label>
+              <div class="field">
+                {{ form.password1 }}
+                {% for e in form.password1.errors %}<div class="err">{{ e }}</div>{% endfor %}
+              </div>
+            </div>
+
+            <div class="row {% if form.password2.errors %}has-error{% endif %}">
+              <label for="{{ form.password2.id_for_label }}">تأكيد كلمة المرور</label>
+              <div class="field">
+                {{ form.password2 }}
+                {% for e in form.password2.errors %}<div class="err">{{ e }}</div>{% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit">إنشاء الحساب</button>
+        </div>
+        
+        <div class="login-link">
+          لديك حساب بالفعل؟ <a href="{% url 'login' %}">تسجيل الدخول</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // إظهار/إخفاء حقول الطفل حسب النوع
+    (function(){
+      const userTypeRadios = document.querySelectorAll('input[name="user_type"]');
+      const childFields = document.getElementById("child-fields");
+      
+      function toggleChildFields() {
+        const isChild = Array.from(userTypeRadios).find(radio => radio.checked)?.value === "child";
+        if (childFields) {
+          childFields.classList.toggle("hidden", !isChild);
+        }
+      }
+      
+      userTypeRadios.forEach(radio => {
+        radio.addEventListener("change", toggleChildFields);
+      });
+      
+      // تشغيل الدالة عند تحميل الصفحة
+      toggleChildFields();
+      
+      // احتفظ بالسلوك القديم للتوافق مع النموذج الأصلي
+      const userType = document.getElementById("id_user_type");
+      const rowAge = document.getElementById("row-age");
+      const rowParent = document.getElementById("row-parent");
+      const rowSpecialist = document.getElementById("row-specialist");
+
+      function toggleExtra() {
+        const isChild = userType && userType.value === "child";
+        if (rowAge && !rowAge.classList.contains("has-error"))
+          rowAge.classList.toggle("hidden", !isChild);
+        if (rowParent && !rowParent.classList.contains("has-error"))
+          rowParent.classList.toggle("hidden", !isChild);
+        if (rowSpecialist && !rowSpecialist.classList.contains("has-error"))
+          rowSpecialist.classList.toggle("hidden", !isChild);
+      }
+      if (userType) {
+        userType.addEventListener("change", toggleExtra);
+        toggleExtra();
+      }
+    })();
+  </script>
+</body>
+</html>

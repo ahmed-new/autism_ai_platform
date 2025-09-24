@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}إضافة طفل جديد{% endblock %}
+
+{% block extra_head %}
+  <style>
+    body{font-family:Tahoma,Arial;background:#f7f9fc;margin:0;padding:24px}
+    .card{background:#fff;border-radius:12px;padding:20px;max-width:520px;margin:auto;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+    label{display:block;margin:10px 0 6px}
+    input, select{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .actions{display:flex;gap:10px;margin-top:16px}
+    .btn{background:#4e73df;color:#fff;border:none;border-radius:10px;padding:10px 16px;cursor:pointer}
+    .btn.secondary{background:#e2e6ea;color:#222}
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <h3>➕ إضافة طفل جديد</h3>
+    <form method="post">
+      {% csrf_token %}
+      <label>اسم المستخدم للطفل</label>
+      <input type="text" name="username" required />
+
+      <div class="row">
+        <div>
+          <label>كلمة المرور</label>
+          <input type="password" name="password" required />
+        </div>
+        <div>
+          <label>العمر</label>
+          <input type="text" name="age" />
+        </div>
+      </div>
+
+      <!-- داخل الفورم في create_child.html، أسفل حقول الطفل -->
+      <label>اختيار الأخصائي (اختياري)</label>
+      <select name="specialist_id">
+        <option value="">— بدون —</option>
+        {% for s in specialists %}
+          <option value="{{ s.id }}">{{ s.username }}</option>
+        {% endfor %}
+      </select>
+
+      <div class="actions">
+        <button class="btn" type="submit">حفظ</button>
+        <a class="btn secondary" href="{% url 'parent_portal:parent_home' %}">رجوع</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}نتيجة استبيان وليّ الأمر — {{ child.username }}{% endblock %}
+
+{% block extra_head %}
+<style>
+  body{font-family:Tahoma,Arial;background:#f7f9fc;padding:24px;margin:0}
+  h2{margin:0 0 8px}
+  .sub{color:#667085;margin:0 0 16px}
+  .card{background:#fff;border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  th,td{padding:10px;border-bottom:1px solid #eee}
+  th{background:#f1f3f8;text-align:center}
+  td.num{width:56px;text-align:center}
+  .pill{display:inline-block;padding:4px 10px;border-radius:999px}
+  .yes{background:#e8f7ee;color:#117a38}
+  .no{background:#fdeaea;color:#a1231e}
+  .muted{color:#667085}
+  a.btn{background:#4e73df;color:#fff;padding:6px 10px;border-radius:8px;text-decoration:none}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<h2>نتيجة استبيان وليّ الأمر — {{ child.username }}</h2>
+<p class="sub">
+  تاريخ الإكمال: {{ submission.created_at|date:"Y-m-d H:i" }}
+  {% if submission.session %}
+    — مرتبط بالجلسة #{{ submission.session.id }}
+  {% endif %}
+</p>
+
+<div class="card">
+  <div><strong>اسم ولي الأمر:</strong> {{ submission.parent_full_name|default:"—" }}</div>
+  <div><strong>العمر (سنوات):</strong> {{ submission.child_age_years|default:"—" }}</div>
+  <div><strong>الجنس:</strong> {{ submission.child_sex|default:"—" }}</div>
+  <div><strong>محل الإقامة:</strong> {{ submission.residence|default:"—" }}</div>
+  <div><strong>التشخيص الحالي:</strong> {{ submission.child_diagnosis|default:"—" }}</div>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">ملخص سريع</h3>
+  <div>إجمالي “نعم”: <span class="pill yes">{{ submission.yes_count }}</span>
+  — إجمالي “لا”: <span class="pill no">{{ submission.no_count }}</span></div>
+  <p class="muted" style="margin-top:8px">تنبيه: مؤشرات استرشادية وليست تشخيصًا.</p>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">الإجابات</h3>
+  <table>
+    <thead><tr><th>#</th><th>السؤال</th><th>الإجابة</th></tr></thead>
+    <tbody>
+      {% for row in ordered %}
+      <tr>
+        <td class="num">{{ row.num }}</td>
+        <td>{{ row.text }}</td>
+        <td>
+          {% if row.answer == "نعم" %}
+            <span class="pill yes">نعم</span>
+          {% elif row.answer == "لا" %}
+            <span class="pill no">لا</span>
+          {% else %}
+            —
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<p>
+  <a class="btn" href="{% url 'parent_portal:parent_scq_form' child.id %}">استبيان جديد</a>
+</p>
+
+{% endblock %}

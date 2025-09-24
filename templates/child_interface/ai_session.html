@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>جلسة التقييم التفاعلية</title>
+  <script src="https://code.responsivevoice.org/responsivevoice.js?key=wV0zwZ54"></script>
+  <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
+  <style>
+  :root{ --brand:#4e73df; --brand-2:#2e59d9; --bg:#f0f4f8; --card:#fff; --text:#111; --muted:#6b7280; --ring:#e5e7eb; --danger:#e74a3b; --success:#16a34a }
+  *{box-sizing:border-box}
+  body{font-family:'Cairo',system-ui; background:var(--bg); color:var(--text); margin:0; min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:24px}
+  .card{ width:min(960px,100%); background:var(--card); border-radius:16px; box-shadow:0 10px 28px rgba(0,0,0,.08); overflow:hidden }
+  .hd{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:18px 22px; border-bottom:1px solid var(--ring) }
+  .ttl{ margin:0; font-size:22px; font-weight:700 }
+  .sub{ margin:0; font-size:14px; color:var(--muted) }
+  .chip{ background:#eef2ff; color:#4338ca; padding:6px 10px; border-radius:999px; font-size:12px }
+  .bd{ padding:22px }
+  #loader{ display:none; color:var(--muted) }
+  #qText{ display:none; font-size:20px; line-height:1.7; margin:8px 0 14px }
+  #media{ display:flex; gap:14px; align-items:center; flex-wrap:wrap }
+  #qImg{ display:none; max-width:260px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.08) }
+  #qVid{ display:none; max-width:min(100%,640px); border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.08) }
+  #opts{ display:flex; flex-wrap:wrap; gap:12px; margin-top:12px }
+  /* === عناصر الاختيارات الافتراضية === */
+  .opt{ background:var(--brand); color:#fff; border:0; border-radius:10px; padding:14px 16px; cursor:pointer; font-size:15px; display:flex; flex-direction:column; align-items:center; min-width:160px }
+  .opt:hover{ background:var(--brand-2) }
+  .opt img{ width:140px; height:140px; object-fit:contain; margin-bottom:8px }
+  /* مناطق الإسقاط والسحب */
+  .drop-wrap{ display:none; margin-top:12px }
+  .drop-zone{ border:2px dashed #cbd5e1; background:#f8fafc; padding:16px; border-radius:12px; display:flex; flex-wrap:wrap; gap:12px; justify-content:center }
+  .drop-target{ border:2px dashed #94a3b8; width:180px; min-height:180px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-direction:column; background:#fff; gap:8px; padding:12px }
+  .drag-item{ padding:8px; background:#eef2f7; border:1px solid #e2e8f0; border-radius:10px; cursor:grab }
+  .drag-item img{ width:140px; height:140px; object-fit:contain; border-radius:10px }
+  .fb{ margin-top:12px; font-size:16px }
+  .acts{ display:flex; gap:10px; flex-wrap:wrap; margin-top:18px }
+  .btn{ border:0; border-radius:10px; padding:10px 14px; cursor:pointer; font-size:14px }
+  .btn-p{ background:var(--brand); color:#fff }
+  .btn-p:hover{ background:var(--brand-2) }
+  .btn-g{ background:#eef2ff; color:#4338ca }
+  .btn-o{ background:#fff; color:var(--text); border:1px solid var(--ring) }
+  .btn-d{ background:var(--danger); color:#fff }
+  .btn-s{ background:var(--success); color:#fff }
+  .ft{ display:flex; gap:10px; justify-content:space-between; align-items:center; padding:14px 22px; border-top:1px solid var(--ring) }
+  .meta{ font-size:12px; color:var(--muted) }
+  /* تتبع النظر */
+  #gazeDot{ position:fixed; width:12px; height:12px; border-radius:999px; background:#ff0077aa; pointer-events:none; z-index:99999; display:none }
+  #calib{ position:fixed; inset:0; background:rgba(0,0,0,.75); color:#fff; display:none; align-items:center; justify-content:center; flex-direction:column; z-index:9999; padding:24px; text-align:center }
+  .grid{ display:grid; grid-template-columns:repeat(3,80px); gap:18px; margin-top:12px }
+  .dot{ width:20px; height:20px; border:3px solid #fff; border-radius:999px; cursor:pointer }
+  .dot.done{ background:#22c55e; border-color:#16a34a; box-shadow:0 0 15px rgba(34,197,94,.6) }
+  dialog{ border:0; border-radius:20px; width:min(720px,calc(100% - 32px)); box-shadow:0 24px 80px rgba(0,0,0,.25); padding:0; overflow:hidden }
+  dialog::backdrop{ background:rgba(0,0,0,.6); backdrop-filter: blur(4px) }
+  .dialog-header{ padding:20px 24px; border-bottom:1px solid var(--ring); background:linear-gradient(to left,#f8fafc,#f1f5f9) }
+  .dialog-title{ margin:0; font-size:20px; color:var(--text) }
+  .dialog-body{ padding:24px; max-height:70vh; overflow-y:auto }
+  .dialog-footer{ padding:16px 24px; border-top:1px solid var(--ring); display:flex; justify-content:flex-end; gap:12px; background:linear-gradient(to left,#f8fafc,#f1f5f9) }
+  .progress-container{ margin-top:24px; padding:16px; background:#f8fafc; border-radius:16px; box-shadow:0 4px 6px rgba(0,0,0,0.05) }
+  .progress-title{ font-size:18px; font-weight:600; margin:0 0 12px; display:flex; align-items:center; gap:8px }
+  .progress-bar{ height:12px; background:#e5e7eb; border-radius:6px; overflow:hidden; margin-bottom:8px }
+  .progress-fill{ height:100%; background:linear-gradient(90deg,var(--brand),var(--brand-2)); border-radius:6px; width:0%; transition:width 1s ease }
+  .progress-stats{ display:flex; justify-content:space-between; font-size:14px; color:#6b7280 }
+  .celebration{ position:fixed; inset:0; pointer-events:none; z-index:9998; display:none }
+  .confetti{ position:absolute; width:10px; height:10px; background:var(--brand); opacity:0 }
+  @media (max-width: 768px){
+    .hd{ flex-direction:column; align-items:flex-start; padding:16px 20px }
+    .session-info{ width:100%; margin-top:12px; flex-direction:column; align-items:flex-start; gap:8px }
+    .bd{ padding:20px }
+    #qText{ font-size:20px }
+    .opt{ min-width:80px }
+    .opt img{ width:80px; height:80px }
+    .drop-target{ width:80px; min-height:80px }
+    .drag-item img{ width:80px; height:80px }
+    .grid{ grid-template-columns:repeat(3,80px); gap:16px }
+  }
+
+  /* ====== تكبير الصور والـDropZones (Overrides) ======
+     مضافة في النهاية مع !important لضمان تغليبها على أي قواعد سابقة */
+  /* === أحجام طبيعية متناسقة للصور والاختيارات === */
+#opts{ gap:14px !important; justify-content:center !important; }
+
+.opt{
+  min-width: 180px !important;
+  padding: 14px 16px !important;
+}
+.opt img{
+  width: 160px !important;
+  height: 160px !important;
+  object-fit: contain !important;
+  margin-bottom: 8px !important;
+}
+
+.drop-target{
+  width: 180px !important;
+  min-height: 180px !important;
+}
+
+.drag-item img{
+  width: 160px !important;
+  height: 160px !important;
+  object-fit: contain !important;
+  border-radius: 10px !important;
+}
+
+/* شاشات أصغر */
+@media (max-width: 1024px){
+  .opt{ min-width:150px !important; }
+  .opt img, .drag-item img{ width:140px !important; height:140px !important; }
+  .drop-target{ width:160px !important; min-height:160px !important; }
+}
+@media (max-width: 768px){
+  .opt{ min-width:130px !important; }
+  .opt img, .drag-item img{ width:120px !important; height:120px !important; }
+  .drop-target{ width:140px !important; min-height:140px !important; }
+}
+
+</style>
+
+</head>
+<body>
+  <section class="card" aria-labelledby="hdr">
+    <header class="hd">
+      <div>
+        <h1 id="hdr" class="ttl">مرحبًا يا {{ child.username }} 👋</h1>
+        <p class="sub">المجال: {{ category }}</p>
+      </div>
+      <div class="session-info">
+        <div id="session-timer" class="session-timer">
+          <span class="icon">⏱️</span>
+          <span>المدة: 0ث</span>
+        </div>
+        <div class="chip" id="attChip" title="مؤشر الانتباه">
+          <span class="icon">👀</span>
+          <span>انتباه: —%</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="bd">
+      <div id="loader">
+        <div class="loader-animation"></div>
+        <p>جاري تحميل السؤال التالي...</p>
+      </div>
+
+      <div id="media">
+        <img id="qImg" alt="صورة السؤال" />
+        <video id="qVid" controls muted autoplay loop>
+          <source src="" type="video/mp4" />
+          المتصفح لا يدعم تشغيل الفيديو.
+        </video>
+      </div>
+
+      <div id="qText"></div>
+      <div id="opts" role="group" aria-label="الاختيارات"></div>
+
+      <section class="drop-wrap">
+        <div class="drop-zone" id="dropZone" aria-live="polite"></div>
+        <button id="verifyBtn" class="btn btn-p" style="display:none; margin-top: 16px;">تأكيد الإجابة</button>
+      </section>
+
+      <p id="fb" class="fb" aria-live="polite"></p>
+
+      <div class="acts">
+        <button id="startBtn" class="btn btn-s">ابدأ الجلسة الآن</button>
+        <button id="nextBtn" class="btn btn-p" style="display:none">السؤال التالي</button>
+        <button id="endBtn" class="btn btn-d" type="button">إنهاء الجلسة</button>
+      </div>
+    </div>
+
+    <footer class="ft">
+      <span class="meta">* هذه الصفحة مخصّصة للطفل لإدارة الجلسة التفاعلية.</span>
+    </footer>
+  </section>
+
+  <!-- معايرة تتبّع النظر -->
+  <div id="calib" aria-modal="true" role="dialog">
+    <h3 class="calib-title">معايرة سريعة للعين 👀</h3>
+    <p class="calib-desc">اضغط على 9 نقاط بالترتيب لتدريب الكاميرا على متابعة نظرك (اسمح للمتصفح باستخدام الكاميرا).</p>
+    <div class="grid" id="calibGrid"></div>
+    <button id="calibSkip" class="btn btn-o" style="margin-top:20px">تخطي المعايرة</button>
+  </div>
+
+  <div id="gazeDot" aria-hidden="true"></div>
+
+  <!-- حوار التقدّم -->
+  <dialog id="progDlg">
+    <div class="dialog-header">
+      <h3 class="dialog-title">التقدّم الحالي</h3>
+    </div>
+    <div class="dialog-body" id="progBox">جارِ التحميل…</div>
+    <div class="dialog-footer">
+      <button class="btn btn-o" onclick="document.getElementById('progDlg').close()">إغلاق</button>
+    </div>
+  </dialog>
+
+  <!-- تأثيرات الاحتفال -->
+  <div class="celebration" id="celebration"></div>
+
+  <script>
+    // عناصر DOM
+    const loader = document.getElementById('loader');
+    const qText = document.getElementById('qText');
+    const qImg = document.getElementById('qImg');
+    const qVid = document.getElementById('qVid');
+    const opts = document.getElementById('opts');
+    const dropZone = document.getElementById('dropZone');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const fb = document.getElementById('fb');
+
+    const startBtn = document.getElementById('startBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const endBtn = document.getElementById('endBtn');
+
+    const progDlg = document.getElementById('progDlg');
+    const progBox = document.getElementById('progBox');
+
+    const attChip = document.getElementById('attChip');
+    const celebration = document.getElementById('celebration');
+
+    let currentQuestionId = null;
+    let dragAnswers = {};
+
+    // ================= نطق متسلسل (Queue) =================
+    function ttsCancel(){
+      try { if (typeof responsiveVoice !== 'undefined') responsiveVoice.cancel(); } catch(_){}
+    }
+    function speakOne(text, next){
+      if (!text) { if (next) next(); return; }
+      if (typeof responsiveVoice === 'undefined'){ if (next) next(); return; }
+      try{
+        responsiveVoice.speak(text, 'Arabic Female', {
+          rate: 0.9,
+          onend: () => setTimeout(() => next && next(), 300) // فاصل بسيط بعد انتهاء الجملة
+        });
+      }catch(_){ if (next) next(); }
+    }
+    function speakQueue(list){
+      let i = 0;
+      const step = () => (i < list.length) ? speakOne(list[i++], step) : null;
+      step();
+    }
+    function startSpeakingForQuestion(data, labels, extraBeforeLabels = []){
+      ttsCancel();
+      const seq = [];
+      seq.push(data.question_text || '');
+      seq.push(...extraBeforeLabels);
+      seq.push(...(labels || []));
+      speakQueue(seq);
+    }
+
+    const show = el => el.style.display = 'block';
+    const hide = el => el.style.display = 'none';
+
+    function resetUI(){
+      hide(qText); hide(qImg); hide(qVid); hide(verifyBtn);
+      opts.innerHTML = ''; dropZone.innerHTML = '';
+      document.querySelector('.drop-wrap').style.display = 'none';
+      fb.textContent = ''; fb.className = 'fb';
+      dragAnswers = {};
+    }
+
+    function createConfetti() {
+      celebration.style.display = 'block';
+      celebration.innerHTML = '';
+      const colors = ['#4e73df', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+      for (let i = 0; i < 100; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.top = Math.random() * 100 + '%';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+        confetti.style.width = Math.random() * 10 + 5 + 'px';
+        confetti.style.height = Math.random() * 10 + 5 + 'px';
+        confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+        celebration.appendChild(confetti);
+        setTimeout(() => {
+          confetti.style.opacity = '1';
+          confetti.style.transform = `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 + 500}px) rotate(${Math.random() * 360}deg)`;
+          confetti.style.transition = `all ${Math.random() * 3 + 2}s ease-out`;
+        }, Math.random() * 500);
+      }
+      setTimeout(() => { celebration.style.display = 'none'; }, 5000);
+    }
+
+    function fetchQuestion(){
+      ttsCancel(); // أوقف أي نطق قديم
+      show(loader); resetUI();
+
+      fetch('/ai/generate-question/',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({})
+      })
+      .then(r=>r.json())
+      .then(data=>{
+        hide(loader);
+
+        if (data.end_of_session){
+          qText.textContent = '🎉 انتهت الجلسة، أحسنت! لقد أكملت جميع الأسئلة بنجاح.';
+          show(qText); hide(nextBtn); createConfetti();
+          speakQueue([qText.textContent]);
+          return;
+        }
+
+        currentQuestionId = data.question_id;
+        qText.textContent = data.question_text || '';
+        show(qText);
+
+        if (data.image){ qImg.src = data.image; show(qImg); }
+        if (data.video){
+          qVid.querySelector('source').src = data.video; qVid.load(); show(qVid);
+        }
+
+        if (data.question_type === 'image_choice'){
+          const labels = [];
+          (data.options||[]).forEach((opt, index) => {
+            const b = document.createElement('button');
+            b.className = 'opt';
+            b.onclick = () => checkAnswer(opt.image);
+            b.style.animationDelay = `${0.1 * index}s`;
+            b.setAttribute('aria-label', opt.label || '');
+
+            const img = document.createElement('img');
+            img.src = '/media/questions/images/' + opt.image;
+            img.alt = opt.label || '';
+            img.draggable = false;
+
+            const lbl = document.createElement('div');
+            lbl.textContent = opt.label || '';
+            lbl.style.fontSize = '18px';
+            lbl.style.marginTop = '10px';
+
+            b.append(img, lbl);
+            opts.append(b);
+            labels.push(opt.label || '');
+          });
+
+          startSpeakingForQuestion(data, labels);
+
+        } else if (data.question_type === 'text_choice'){
+          const labels = [];
+          (data.options||[]).forEach((opt, index) => {
+            const b = document.createElement('button');
+            b.className = 'opt';
+            b.textContent = opt.label;
+            b.setAttribute('aria-label', opt.label);
+            b.onclick = () => checkAnswer(opt.label);
+            b.style.animationDelay = `${0.1 * index}s`;
+            opts.append(b);
+            labels.push(opt.label);
+          });
+
+          startSpeakingForQuestion(data, labels);
+
+        } else if (data.question_type === 'drag_and_drop' && Array.isArray(data.options)){
+          document.querySelector('.drop-wrap').style.display = 'block';
+          show(verifyBtn);
+
+          const uniqueTargets = [...new Set(data.options.map(o => o.target))];
+          uniqueTargets.forEach(target => {
+            const t = document.createElement('div');
+            t.className = 'drop-target';
+            t.dataset.target = target;
+            t.innerHTML = `<span style="font-size:18px">${target}</span>`;
+            t.ondragover = e => e.preventDefault();
+            t.ondrop = e => {
+              e.preventDefault();
+              const image = e.dataTransfer.getData('image');
+              (dragAnswers[target] ||= []).push(image);
+
+              const im = document.createElement('img');
+              im.src = '/media/questions/images/' + image;
+              im.width = 110; im.height = 110;
+              im.style.margin = '6px';
+              im.style.borderRadius = '10px';
+              im.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+              im.alt = '';
+              t.append(im);
+            };
+            dropZone.append(t);
+          });
+
+          const dragLabels = [];
+          (data.options||[]).forEach((opt, index) => {
+            const d = document.createElement('div');
+            d.className = 'drag-item';
+            d.style.animationDelay = `${0.1 * index}s`;
+            d.setAttribute('role', 'button');
+
+            const img = document.createElement('img');
+            img.src = '/media/questions/images/' + opt.image;
+            img.alt = opt.label || '';
+            d.appendChild(img);
+
+            d.draggable = true;
+            d.ondragstart = e => e.dataTransfer.setData('image', opt.image);
+            opts.append(d);
+
+            dragLabels.push(opt.label || '');
+          });
+
+          verifyBtn.onclick = () => checkAnswer(dragAnswers);
+
+          const targetPrompts = uniqueTargets.map(t => `منطقة: ${t}`);
+          startSpeakingForQuestion(data, dragLabels, targetPrompts);
+
+        } else {
+          opts.innerHTML = `<p style="text-align:center; padding:20px; color:var(--muted);">🔧 نوع السؤال (${data.question_type}) غير مدعوم بعد.</p>`;
+          startSpeakingForQuestion(data, []); // ينطق السؤال فقط
+        }
+
+        hide(nextBtn);
+        setTimeout(() => refreshAOIs(), 350);
+      })
+      .catch(() => {
+        loader.innerHTML = '<p style="color:var(--danger)">فشل في تحميل السؤال، حاول مرة أخرى.</p>';
+      });
+    }
+
+    function checkAnswer(val){
+      fetch('/ai/verify-answer/',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ answer: val, question_id: currentQuestionId })
+      })
+      .then(r=>r.json())
+      .then(d => {
+        if (d.correct){
+          fb.textContent = '✅ إجابة صحيحة! أحسنت';
+          fb.className = 'fb correct show';
+          speakQueue(['إجابة صحيحة، أحسنت!']);
+          setTimeout(() => {
+            const stars = ['⭐', '🌟', '✨'];
+            for (let i = 0; i < 3; i++) {
+              const star = document.createElement('span');
+              star.textContent = stars[Math.floor(Math.random() * stars.length)];
+              star.style.position = 'absolute';
+              star.style.fontSize = '24px';
+              star.style.left = `${Math.random() * 80 + 10}%`;
+              star.style.top = `${Math.random() * 50 + 25}%`;
+              star.style.opacity = '0';
+              star.style.transform = 'scale(0)';
+              star.style.transition = 'all 0.5s ease-out';
+              document.querySelector('.bd').appendChild(star);
+              setTimeout(() => { star.style.opacity = '1'; star.style.transform = 'scale(1.5)'; }, 100);
+              setTimeout(() => { star.style.opacity = '0'; star.style.transform = 'translateY(-50px) scale(0.5)'; }, 1500);
+              setTimeout(() => { star.remove(); }, 2000);
+            }
+          }, 300);
+        } else {
+          fb.textContent = '❌ إجابة خاطئة، حاول مرة أخرى';
+          fb.className = 'fb incorrect show';
+          speakQueue(['حاول مرة أخرى، أنت تستطيع!']);
+        }
+        show(nextBtn);
+      })
+      .catch(() => {
+        fb.textContent = 'حدث خطأ أثناء التحقق من الإجابة';
+        fb.className = 'fb show';
+        fb.style.color = 'var(--danger)';
+      });
+    }
+
+    endBtn.onclick = () => {
+      if (!confirm('هل تريد إنهاء الجلسة؟')) return;
+      ttsCancel();
+      fetch('/ai/end-session/',{method:'POST', headers:{'Content-Type':'application/json'}})
+        .then(r=>r.json())
+        .then(d => {
+          if (d.ok){ alert('تم إنهاء الجلسة بنجاح.'); window.location.href = '/child/'; }
+          else { alert(d.error || 'تعذّر إنهاء الجلسة.'); }
+        })
+        .catch(() => alert('تعذّر إنهاء الجلسة.'));
+    };
+
+    startBtn.onclick = () => { ttsCancel(); hide(startBtn); fetchQuestion(); showCalibration(); };
+    nextBtn.onclick  = () => { ttsCancel(); fetchQuestion(); };
+
+    // ================= تتبع النظر =================
+    let gazeEnabled = false, gazeTimer = null, gazeBatch = [], sendInterval = null; let AOIs = [], onTaskMs = 0, totalMs = 0, lastTs = null;
+
+    (function buildCalib(){
+      const g = document.getElementById('calibGrid');
+      if (!g) return;
+      for (let i = 0; i < 9; i++){
+        const d = document.createElement('div');
+        d.className = 'dot';
+        d.title = 'انقر للتثبيت';
+        d.onclick = () => d.classList.add('done');
+        g.appendChild(d);
+      }
+    })();
+
+    function showCalibration(){
+      const c = document.getElementById('calib');
+      c.style.display = 'flex';
+      document.getElementById('calibSkip').onclick = () => { hideCalibration(); initWebGazer().then(() => refreshAOIs()); };
+      document.getElementById('calibGrid').addEventListener('click', () => {
+        const all = [...document.querySelectorAll('.dot')];
+        const done = all.filter(x => x.classList.contains('done')).length;
+        if (done >= 9){ hideCalibration(); initWebGazer().then(() => refreshAOIs()); }
+      });
+    }
+
+    function hideCalibration(){ document.getElementById('calib').style.display = 'none'; }
+
+    async function initWebGazer(){
+      try{
+        webgazer.setRegression('ridge');
+        webgazer.setTracker('TFFacemesh');
+        webgazer.showVideoPreview(false).showPredictionPoints(false).applyKalmanFilter(true);
+        await webgazer.begin();
+        gazeEnabled = true;
+        document.getElementById('gazeDot').style.display = 'block';
+
+        webgazer.setGazeListener((data, ts) => {
+          if (!data) return;
+          const x = data.x, y = data.y;
+          const dot = document.getElementById('gazeDot');
+          dot.style.transform = `translate(${x-8}px, ${y-8}px)`;
+          if (lastTs === null) lastTs = ts;
+          const dt = Math.max(0, ts - lastTs); lastTs = ts;
+          const onTask = isOnAny(x, y, AOIs) ? 1 : 0;
+          totalMs += dt; if (onTask) onTaskMs += dt;
+          if (!gazeTimer){
+            gazeTimer = setTimeout(() => gazeTimer = null, 70);
+            gazeBatch.push({ t: Date.now(), x: Math.round(x), y: Math.round(y), on_task: onTask, qid: currentQuestionId || null });
+          }
+        });
+
+        if (!sendInterval){ sendInterval = setInterval(sendBatch, 2000); }
+      } catch(e){ console.warn('WebGazer init failed', e); gazeEnabled = false; }
+    }
+
+    function stopWebGazer(){
+      try{
+        if (sendInterval) { clearInterval(sendInterval); sendInterval = null; }
+        sendBatch(); webgazer.pause(); gazeEnabled = false; document.getElementById('gazeDot').style.display = 'none';
+      } catch(_){}
+    }
+
+    function isOnAny(x, y, rects){ return rects.some(r => x >= r.left && x <= r.right && y >= r.top && y <= r.bottom); }
+
+    function refreshAOIs(){
+      AOIs = [];
+      [qText, qImg, qVid, opts, dropZone].forEach(el => {
+        if (!el) return;
+        const cs = getComputedStyle(el);
+        if (el.style.display === 'none' || cs.display === 'none') return;
+        const r = el.getBoundingClientRect();
+        if (r.width > 10 && r.height > 10){ AOIs.push({ left:r.left, top:r.top, right:r.right, bottom:r.bottom }); }
+      });
+      onTaskMs = 0; totalMs = 0; lastTs = null;
+    }
+
+    function attentionPct(){ if (totalMs <= 0) return 0; return Math.round((onTaskMs / totalMs) * 100); }
+
+    function sendBatch(){
+      if (gazeBatch.length === 0) return;
+      const payload = { samples: gazeBatch.slice(0) };
+      gazeBatch.length = 0;
+      fetch('/ai/gaze-ingest/', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) }).catch(() => {});
+    }
+
+    setInterval(() => {
+      const pct = attentionPct();
+      attChip.innerHTML = `<span class="icon">👀</span><span>انتباه: ${pct}%</span>`;
+    }, 1200);
+
+    window.addEventListener('beforeunload', () => { try{ stopWebGazer(); } catch(_){} });
+  </script>
+
+  <script>
+    (function(){
+      const el = document.getElementById('session-timer');
+      if (!el) return;
+      function tick(){
+        fetch('/ai/progress/').then(r => r.json()).then(d => {
+          const t = (d && d.totals) ? d.totals : {};
+          el.innerHTML = `<span class="icon">⏱️</span><span>المدة: ${t.elapsed_human || '0ث'}</span>`;
+        }).catch(() => {});
+      }
+      tick();
+      setInterval(tick, 5000);
+    })();
+  </script>
+</body>
+
+</html>

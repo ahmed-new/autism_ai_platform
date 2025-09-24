@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}تعيين أخصائي — {{ child.username }}{% endblock %}
+
+{% block extra_head %}
+  <style>
+    body{font-family:Tahoma,Arial;background:#f6f8fb;margin:0;color:#1f2937}
+    .wrap{max-width:720px;margin:24px auto;padding:0 16px}
+    .card{background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);padding:18px}
+    h1{font-size:22px;margin:0 0 12px}
+    .muted{color:#6b7280}
+    form.search{display:flex;gap:8px;margin:10px 0 14px}
+    input[type="text"]{flex:1;padding:10px 12px;border-radius:10px;border:1px solid #e5e7eb}
+    .btn{background:#4e73df;color:#fff;border:none;border-radius:10px;padding:10px 14px;cursor:pointer;text-decoration:none}
+    .btn--ghost{background:#fff;color:#4e73df;border:1px solid #d7ddff}
+    .list{margin:0;padding:0;list-style:none;max-height:420px;overflow:auto;border:1px solid #e5e7eb;border-radius:12px}
+    .row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #eef2f7}
+    .row:last-child{border-bottom:none}
+    .name{font-weight:700}
+    .actions{display:flex;gap:8px;align-items:center}
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="wrap">
+    <div class="card">
+      <h1>تعيين أخصائي — <span class="muted">{{ child.username }}</span></h1>
+
+      <form class="search" method="get">
+        <input type="text" name="q" value="{{ q }}" placeholder="ابحث بالاسم أو البريد…" />
+        <button class="btn" type="submit">بحث</button>
+        <a class="btn btn--ghost" href="{% url 'parent_portal:parent_home' %}">رجوع</a>
+      </form>
+
+      <form method="post">
+        {% csrf_token %}
+        <ul class="list">
+          {% for s in specialists %}
+            <li class="row">
+              <div>
+                <div class="name">{{ s.username }}</div>
+                {% if s.first_name or s.last_name %}
+                  <div class="muted">{{ s.first_name }} {{ s.last_name }}</div>
+                {% endif %}
+                {% if s.email %}<div class="muted">{{ s.email }}</div>{% endif %}
+              </div>
+              <div class="actions">
+                <label>
+                  <input type="radio" name="specialist_id" value="{{ s.id }}" required />
+                  اختيار
+                </label>
+              </div>
+            </li>
+          {% empty %}
+            <li class="row"><div class="muted">لا يوجد أخصائيون مطابقون لبحثك.</div></li>
+          {% endfor %}
+        </ul>
+
+        <div style="display:flex;gap:8px;justify-content:flex-start;margin-top:12px">
+          <button class="btn" type="submit">حفظ التعيين</button>
+          <a class="btn btn--ghost" href="{% url 'parent_portal:parent_home' %}">إلغاء</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
