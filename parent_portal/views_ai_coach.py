@@ -235,7 +235,7 @@ def _call_gemini(payload: dict, user_prompt: str):
         safety = _safety_settings()
 
         model = genai.GenerativeModel(
-            model_name="gemini-1.5-flash",
+            model_name="gemini-2.5-flash-lite",
             system_instruction=_compose_system_prompt(),
             safety_settings=safety,
             generation_config={

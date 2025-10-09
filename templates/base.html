@@ -5,99 +5,71 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>{% block title %}لوحتك{% endblock %} | {{ SITE_NAME|default:"منصّة" }}</title>
-    
-  <!-- ألوان وستايل عام -->
+
+  <!-- Bootstrap RTL CSS -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css"
+        integrity="sha384-PJsj/BTMqILvmcej7ulplguok8ag4xFTPryRq8xevL7eBYSmpXKcbNVuy+P0RMgq"
+        crossorigin="anonymous">
+
+  <!-- Basic styles -->
   <style>
     :root{
       --bg:#f8fafd; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
       --primary:#4e73df; --primary-600:#2e59d9; --ring:#e5e7eb;
-      --chip:#eef2ff; --chip-border:#d7ddff; --ok:#16a34a;
-      --warn:#a16207; --danger:#dc2626;
-      --shadow:0 4px 12px rgba(0,0,0,.08);
-      --radius:14px; --radius-sm:10px;
-      --container:1100px;
+      --chip:#eef2ff; --chip-border:#d7ddff; --shadow:0 4px 12px rgba(0,0,0,.08);
+      --radius:14px; --radius-sm:10px; --container:1100px;
       --transition: all 0.2s ease-in-out;
     }
     *{box-sizing:border-box}
     html,body{margin:0;background:var(--bg);color:var(--text);font-family:Tahoma,Arial,system-ui;line-height:1.7}
     a{color:inherit;text-decoration:none;transition:var(--transition)}
     .container{max-width:var(--container);margin:0 auto;padding:0 24px}
+
     .btn{
-      display:inline-flex;align-items:center;justify-content:center;
-      gap:8px;padding:12px 20px;font-size:1rem;font-weight:600;
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:12px 20px;font-size:1rem;font-weight:600;min-width:120px;
       border-radius:var(--radius-sm);border:1px solid transparent;
-      background:var(--primary);color:#fff;cursor:pointer;
-      box-shadow:var(--shadow);transition:var(--transition);
-      min-width:120px;text-align:center;
+      background:var(--primary);color:#fff;cursor:pointer;box-shadow:var(--shadow);
+      transition:var(--transition);text-align:center;
     }
     .btn:hover{background:var(--primary-600);transform:translateY(-2px)}
     .btn:focus{outline:none;box-shadow:0 0 0 3px rgba(78,115,223,0.3),var(--shadow)}
     .btn--ghost{background:#fff;color:var(--primary);border-color:var(--chip-border)}
     .btn--ghost:hover{background:#f7f9ff;border-color:var(--primary)}
-    .card{
-      background:var(--card);border-radius:var(--radius);
-      box-shadow:var(--shadow);padding:24px;
-      transition:var(--transition);
-    }
+
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;transition:var(--transition)}
     .card:hover{box-shadow:0 8px 16px rgba(0,0,0,.1)}
 
     /* Navbar */
     .navbar{
       background:#fff;border-bottom:1px solid var(--ring);
-      position:sticky;top:0;z-index:50;
-      box-shadow:0 2px 8px rgba(0,0,0,.04);
+      position:sticky;top:0;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,.04);
     }
-    .nav-inner{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:12px 0;
-    }
-    .brand{
-      display:flex;align-items:center;gap:16px;
-      transition:var(--transition);
-    }
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+    .brand{display:flex;align-items:center;gap:16px;transition:var(--transition);order:1}
     .brand:hover{opacity:0.9}
-    .logo-img{
-      height:80px;width:auto;display:block;
-      transition:var(--transition);
-    }
-    .brand-name{
-      font-weight:800;font-size:1.4rem;
-      color:var(--primary);
-    }
-    .nav-links{
-      display:flex;align-items:center;gap:16px;
-    }
+    .logo-img{height:80px;width:auto;display:block;transition:var(--transition)}
+    .brand-name{font-weight:800;font-size:1.4rem;color:var(--primary)}
+    .nav-links{display:flex;align-items:center;gap:16px;margin-inline-start:auto;order:2}
     .nav-link{
-      padding:10px 16px;border-radius:var(--radius-sm);
-      font-weight:600;transition:var(--transition);
-      position:relative;
+      padding:10px 16px;border-radius:var(--radius-sm);font-weight:600;transition:var(--transition);position:relative;
     }
-    .nav-link:hover{
-      background:#f7f9ff;color:var(--primary);
-    }
-    .nav-link.active{
-      background:var(--chip);color:var(--primary);
-      font-weight:700;
-    }
+    .nav-link:hover{background:#f7f9ff;color:var(--primary)}
+    .nav-link.active{background:var(--chip);color:var(--primary);font-weight:700}
     .nav-link.active:after{
-      content:'';position:absolute;bottom:-2px;
-      right:50%;transform:translateX(50%);
-      width:20px;height:3px;border-radius:3px;
-      background:var(--primary);
+      content:'';position:absolute;bottom:-2px;right:50%;transform:translateX(50%);
+      width:20px;height:3px;border-radius:3px;background:var(--primary);
     }
     .hamburger{
-      display:none;background:#fff;border:1px solid var(--ring);
-      border-radius:var(--radius-sm);padding:10px 14px;
-      cursor:pointer;transition:var(--transition);
+      display:none;background:#fff;border:1px solid var(--ring);border-radius:var(--radius-sm);
+      padding:10px 14px;cursor:pointer;transition:var(--transition);order:3
     }
     .hamburger:hover{background:#f7f9ff}
-    
     @media (max-width: 840px){
       .nav-links{
-        display:none;flex-direction:column;align-items:stretch;
-        background:#fff;border:1px solid var(--ring);
-        padding:16px;border-radius:var(--radius);margin-top:12px;
-        box-shadow:var(--shadow);
+        display:none;flex-direction:column;align-items:stretch;background:#fff;border:1px solid var(--ring);
+        padding:16px;border-radius:var(--radius);margin-top:12px;box-shadow:var(--shadow);
       }
       .nav-links.open{display:flex}
       .hamburger{display:inline-flex}
@@ -105,88 +77,32 @@
     }
 
     /* Flash messages */
-    .messages{
-      position:relative;margin:24px 0;
-      animation:slideDown 0.3s ease-out;
-    }
-    @keyframes slideDown{
-      from{opacity:0;transform:translateY(-10px)}
-      to{opacity:1;transform:translateY(0)}
-    }
+    .messages{position:relative;margin:24px 0;animation:slideDown 0.3s ease-out}
+    @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
     .msg{
-      padding:16px;border-radius:var(--radius-sm);
-      margin:12px 0;border:1px solid var(--ring);
-      background:#fff;display:flex;align-items:center;
-      gap:12px;
+      padding:16px;border-radius:var(--radius-sm);margin:12px 0;border:1px solid var(--ring);
+      background:#fff;display:flex;align-items:center;gap:12px;
     }
-    .msg:before{
-      content:'';width:24px;height:24px;
-      background-position:center;
-      background-repeat:no-repeat;
-      flex-shrink:0;
-    }
-    .msg.success{
-      background:#e8f7ee;border-color:#c8eed6;color:#117a38;
-    }
-    .msg.success:before{
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23117a38'%3E%3Cpath d='M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-.997-6l7.07-7.071-1.414-1.414-5.656 5.657-2.829-2.829-1.414 1.414L11.003 16z'/%3E%3C/svg%3E");
-    }
-    .msg.warning{
-      background:#fff4e5;border-color:#ffe1b7;color:#7a4b02;
-    }
-    .msg.warning:before{
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%237a4b02'%3E%3Cpath d='M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-11v6h2v-6h-2zm0-4v2h2V7h-2z'/%3E%3C/svg%3E");
-    }
-    .msg.error{
-      background:#fdeaea;border-color:#f5cccc;color:#a1231e;
-    }
-    .msg.error:before{
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a1231e'%3E%3Cpath d='M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm0-8v6h2V7h-2z'/%3E%3C/svg%3E");
-    }
-    .msg.info{
-      background:#eef2ff;border-color:#d7ddff;color:#1e2a78;
-    }
-    .msg.info:before{
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231e2a78'%3E%3Cpath d='M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-11v6h2v-6h-2zm0-4v2h2V7h-2z'/%3E%3C/svg%3E");
-    }
+    .msg.success{background:#e8f7ee;border-color:#c8eed6;color:#117a38}
+    .msg.warning{background:#fff4e5;border-color:#ffe1b7;color:#7a4b02}
+    .msg.error{background:#fdeaea;border-color:#f5cccc;color:#a1231e}
+    .msg.info{background:#eef2ff;border-color:#d7ddff;color:#1e2a78}
 
     /* Footer */
-    footer{
-      margin-top:48px;border-top:1px solid var(--ring);
-      padding:24px 0;color:var(--muted);background:#fff;
-    }
-    .footer-inner{
-      display:flex;align-items:center;justify-content:space-between;
-      gap:16px;flex-wrap:wrap;
-    }
-    .footer-links{
-      display:flex;gap:24px;flex-wrap:wrap;
-    }
-    .footer-links a{
-      color:var(--muted);position:relative;
-      transition:var(--transition);
-    }
-    .footer-links a:hover{
-      color:var(--primary);
-    }
+    footer{margin-top:48px;border-top:1px solid var(--ring);padding:24px 0;color:var(--muted);background:#fff}
+    .footer-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .footer-links{display:flex;gap:24px;flex-wrap:wrap}
+    .footer-links a{color:var(--muted);position:relative;transition:var(--transition)}
+    .footer-links a:hover{color:var(--primary)}
     .footer-links a:after{
-      content:'';position:absolute;bottom:-2px;
-      right:0;width:0;height:1px;
-      background:var(--primary);
-      transition:var(--transition);
+      content:'';position:absolute;bottom:-2px;right:0;width:0;height:1px;background:var(--primary);transition:var(--transition)
     }
-    .footer-links a:hover:after{
-      width:100%;
-    }
-    
+    .footer-links a:hover:after{width:100%}
+
     /* Main content area */
-    main.container{
-      margin-top:32px;margin-bottom:48px;
-      min-height:calc(100vh - 300px);
-    }
-    
-    /* Responsive adjustments */
-    @media (max-width: 640px) {
+    main.container{margin-top:32px;margin-bottom:48px;min-height:calc(100vh - 300px)}
+
+    @media (max-width: 640px){
       .container{padding:0 16px}
       .footer-inner{flex-direction:column;text-align:center}
       .footer-links{justify-content:center}
@@ -202,56 +118,60 @@
   <nav class="navbar">
     <div class="container">
       <div class="nav-inner">
-        {# قبل اللينك: حدّدنا عنوان الصفحة الرئيسية حسب نوع المستخدم #}
-{% if request.user.is_authenticated %}
-  {% if request.user.user_type == 'parent' %}
-    {% url 'parent_portal:home' as brand_home %}
-  {% elif request.user.user_type == 'specialist' %}
-    {# غيّر الاسم حسب مشروعك لو مختلف #}
-    {% url 'specialist_home' as brand_home %}
-  {% elif request.user.user_type == 'child' %}
-    {# غيّر الاسم حسب مشروعك لو مختلف #}
-    {% url 'child_home' as brand_home %}
-  {% else %}
-    {% url 'home' as brand_home %}
-  {% endif %}
-{% else %}
-  {# صفحة ترحيبية/هبوط للزوّار — بدّل الاسم لو مختلف #}
-  {% url 'landing' as brand_home %}
-{% endif %}
-
-{# استخدمنا fallback للروت / لو أي URL Name مش متعرّف #}
-<a href="{{ brand_home|default:'/' }}" class="brand"
-   title="{{ SITE_NAME|default:"تمكين" }}" aria-label="الصفحة الرئيسية">
-  <img src="{% static 'brand/tamkeen-logo.png' %}" alt="تمكين" class="logo-img" />
-  <div class="brand-name">{{ SITE_NAME|default:"تمكين" }}</div>
-</a>
-
-        <button class="hamburger" id="navToggle" aria-label="قائمة" aria-expanded="false">
-          ☰
-        </button>
-
-        <div class="nav-links" id="navMenu" role="navigation">
-          {% if request.user.is_authenticated %}
-
-            {# روابط حسب نوع المستخدم #}
-            {% if request.user.user_type == "parent" %}
-              <a class="nav-link {% if request.resolver_match and request.resolver_match.namespace == 'parent_portal' %}active{% endif %}" href="{% url 'parent_portal:parent_home' %}" aria-current="{% if request.resolver_match and request.resolver_match.namespace == 'parent_portal' %}page{% endif %}">لوحة وليّ الأمر</a>
-            {% elif request.user.user_type == "specialist" %}
-              <a class="nav-link" href="{% url 'specialist_home' %}">لوحة الأخصائي</a>
-            {% elif request.user.user_type == "child" %}
-              <a class="nav-link" href="/child/">لوحة الطفل</a>
-            {% endif %}
-            <a class="nav-link" href="{% url 'password_change' %}"> تغيير كلمه المرور</a>
-            <a class="nav-link" href="{% url 'logout' %}">تسجيل الخروج</a>
-            
-          {% else %}
-            <a class="nav-link {% if request.resolver_match and request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}" aria-current="{% if request.resolver_match and request.resolver_match.url_name == 'login' %}page{% endif %}">تسجيل الدخول</a>
-            <a class="btn" href="{% url 'register' %}">إنشاء حساب</a>
+  
+      {# تحديد رابط الصفحة الرئيسية بحسب نوع المستخدم #}
+      {% if request.user.is_authenticated %}
+        {% if request.user.user_type == 'parent' %}
+          {% url 'parent_portal:parent_home' as brand_home %}
+        {% elif request.user.user_type == 'specialist' %}
+          {% url 'specialist_home' as brand_home %}
+        {% elif request.user.user_type == 'child' %}
+          {% url 'child_home' as brand_home %}
+        {% else %}
+          {% url 'home' as brand_home %}
+        {% endif %}
+      {% else %}
+        {% url 'landing' as brand_home %}
+      {% endif %}
+  
+      <a href="{{ brand_home|default:'/' }}" class="brand"
+         title="{{ SITE_NAME|default:'تمكين' }}" aria-label="الصفحة الرئيسية">
+        <img src="{% static 'brand/tamkeen-logo.png' %}" alt="تمكين" class="logo-img" />
+        <div class="brand-name">{{ SITE_NAME|default:"تمكين" }}</div>
+      </a>
+  
+      <button class="hamburger" id="navToggle" aria-label="قائمة" aria-expanded="false">☰</button>
+  
+      <div class="nav-links" id="navMenu" role="navigation">
+        {% if request.user.is_authenticated %}
+  
+          {% if request.user.user_type == "parent" %}
+            <a class="nav-link {% if request.resolver_match and request.resolver_match.namespace == 'parent_portal' %}active{% endif %}"
+               href="{% url 'parent_portal:parent_home' %}"
+               aria-current="{% if request.resolver_match and request.resolver_match.namespace == 'parent_portal' %}page{% endif %}">
+               لوحة وليّ الأمر
+            </a>
+          {% elif request.user.user_type == "specialist" %}
+            <a class="nav-link" href="{% url 'specialist_home' %}">لوحة الأخصائي</a>
+          {% elif request.user.user_type == "child" %}
+            <a class="nav-link" href="{% url 'child_home' %}">لوحة الطفل</a>
           {% endif %}
-        </div>
+  
+          <a class="nav-link" href="{% url 'password_change' %}">تغيير كلمة المرور</a>
+          <a class="nav-link" href="{% url 'logout' %}">تسجيل الخروج</a>
+        
+        {% else %}
+          <a class="nav-link {% if request.resolver_match and request.resolver_match.url_name == 'login' %}active{% endif %}"
+             href="{% url 'login' %}"
+             aria-current="{% if request.resolver_match and request.resolver_match.url_name == 'login' %}page{% endif %}">
+             تسجيل الدخول
+          </a>
+          <a class="btn" href="{% url 'register' %}">إنشاء حساب</a>
+        {% endif %}
       </div>
+  
     </div>
+  </div>
   </nav>
 
   <!-- FLASH MESSAGES -->
@@ -265,7 +185,7 @@
     {% endif %}
   </div>
 
-  <!-- MAIN -->
+  <!-- MAIN CONTENT -->
   <main class="container">
     {% block content %}{% endblock %}
   </main>
@@ -282,10 +202,15 @@
           <a href="#" title="الدعم">الدعم</a>
         </div>
       </div>
+      <div class="footer-contact" style="margin-top: 15px; text-align: center; font-size: 0.9em;">
+        <div><strong>د/ سجى أبو تايه</strong></div>
+        <div>البريد الإلكتروني: <a href="mailto:Sajaabutayeh@gmail.com">Sajaabutayeh@gmail.com</a></div>
+        <div>الهاتف: <a href="tel:+962796981048">+962 7 9698 1048</a></div>
+      </div>
     </div>
   </footer>
 
-  <!-- Scripts -->
+  <!-- SCRIPTS -->
   <script>
     // فتح/إغلاق قائمة الموبايل
     (function(){
